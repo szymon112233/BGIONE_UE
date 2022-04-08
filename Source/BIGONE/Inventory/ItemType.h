@@ -8,23 +8,20 @@
 /**
  * 
  */
-UCLASS(Blueprintable, BlueprintType, Abstract)
+UCLASS(Blueprintable, BlueprintType)
 class BIGONE_API UItemType : public UDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FString Name;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FIntPoint Size;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UTexture Icon;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UTexture* Icon;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	bool IsStackable;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int MaxStackSize = 1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	uint8 MaxStackSizeTest = 1;
 };
