@@ -44,7 +44,13 @@ public:
 	FIntPoint GetInventorySize() const;
 
 	UFUNCTION(BlueprintCallable)
+	FIntPoint GetFirstSlot(int index);
+
+	UFUNCTION(BlueprintCallable)
 	bool AddItem(UItemStackInstance* item, FIntPoint position);
+
+	UFUNCTION(BlueprintCallable)
+	bool IsSpaceTaken(FIntPoint position, FIntPoint size);
 	
 	UFUNCTION(BlueprintCallable)
 	bool RemoveItemByReference(UItemStackInstance* item);
@@ -58,7 +64,13 @@ private:
 	FIntPoint Size;
 
 	TArray<int> Slots;
+	
+	const int EMPTY_SLOT_INDEX = -1;
+
+	bool SetSlotsIndex(FIntPoint position, FIntPoint size, int index);
 
 	int PositionToIndex(FIntPoint position) const;
 	FIntPoint IndexToPosition(int index) const;
+
+	
 };

@@ -6,7 +6,10 @@
 void UInventoryInstance::Initialize(FIntPoint size)
 {
 	this->Size = size;
-	Slots.AddDefaulted(GetTotalSlotsCount());
+	for (int i = 0; i < GetTotalSlotsCount(); ++i)
+	{
+		Slots.Add(-1);
+	}
 }
 
 bool UInventoryInstance::IsEmpty() const
@@ -24,7 +27,7 @@ int UInventoryInstance::GetFreeSlotsCount() const
 	int count = 0;
 	for (int i = 0; i < Slots.Num(); ++i)
 	{
-		if (Size[i] == -1)
+		if (Slots[i] == -1)
 		{
 			count++;
 		}
@@ -45,29 +48,67 @@ FIntPoint UInventoryInstance::GetInventorySize() const
 
 bool UInventoryInstance::AddItem(UItemStackInstance* item, FIntPoint position)
 {
-	if (IsSlotTaken(position))
+	if (IsSpaceTaken(position, item->ItemType->Size))
 	{
 		return false;
 	}
 
+	int index = Items.Add(item);
+	SetSlotsIndex(position, item->ItemType->Size, index);
 	
+	return true;
+}
+
+bool UInventoryInstance::IsSpaceTaken(FIntPoint position, FIntPoint size)
+{
+	for (int i = 0; i < size.X; ++i)
+	{
+		for (int j = 0; j < size.Y; ++j)
+		{
+			FIntPoint pointToCheck = position + FIntPoint(i,j); 
+			if (IsSlotTaken(pointToCheck))
+			{
+				return true;
+			}
+		}
+	}
+
 	return false;
 }
 
 
 bool UInventoryInstance::RemoveItemByReference(UItemStackInstance* item)
 {
-	return false;
+	if (!Items.Contains(item))
+	{
+		return false;
+	}
+	
+	SetSlotsIndex(GetFirstSlot(Items.Find(item)), item->ItemType->Size, EMPTY_SLOT_INDEX);
+	Items.Remove(item);
+	
+	return true;
 }
 
 bool UInventoryInstance::RemoveItemByPosition(FIntPoint position)
 {
-	return false;
+	if (!IsSlotTaken(position))
+	{
+		return false;
+	}
+	
+	int index = PositionToIndex(position);
+	UItemStackInstance* item = Items[index];
+
+	SetSlotsIndex(position, item->ItemType->Size, EMPTY_SLOT_INDEX);
+	Items.RemoveAt(index);
+	
+	return true;
 }
 
 bool UInventoryInstance::IsSlotTaken(FIntPoint position) const
 {
-	return Slots[PositionToIndex(position)] != -1;
+	return Slots[PositionToIndex(position)] != EMPTY_SLOT_INDEX;
 }
 
 UItemStackInstance* UInventoryInstance::GetItemAtPosition(FIntPoint position)
@@ -82,15 +123,42 @@ UItemStackInstance* UInventoryInstance::GetItemAtPosition(FIntPoint position)
 	}
 }
 
+bool UInventoryInstance::SetSlotsIndex(FIntPoint position, FIntPoint size, int index)
+{
+	for (int i = 0; i < size.X; ++i)
+	{
+		for (int j = 0; j < size.Y; ++j)
+		{
+			FIntPoint pointToCheck = position + FIntPoint(i,j);
+			Slots[PositionToIndex(pointToCheck)] = index;
+		}
+	}
+
+	return true;
+}
+
+FIntPoint UInventoryInstance::GetFirstSlot(int index)
+{
+	for (int i = 0; i < Slots.Num(); ++i)
+	{
+		if (Slots[i] == index)
+		{
+			return IndexToPosition(i);
+		}
+	}
+
+	return FIntPoint();
+}
+
 int UInventoryInstance::PositionToIndex(const FIntPoint position) const
 {
-	return position.X -1 * Size.X + position.Y -1;
+	return position.X * Size.X + position.Y;
 }
 
 FIntPoint UInventoryInstance::IndexToPosition(int index) const
 {
 	FIntPoint position;
-	position.X = index/Size.X + 1;
-	position.Y = index%Size.X + 1;
+	position.X = index/Size.X;
+	position.Y = index%Size.X;
 	return position;
 }
