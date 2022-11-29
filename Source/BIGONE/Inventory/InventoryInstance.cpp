@@ -3,7 +3,7 @@
 
 #include "InventoryInstance.h"
 
-void UInventoryInstance::Initialize(FIntPoint size)
+void UInventoryInstance::Initialize(FIntPoint size, FString Name)
 {
 	this->Size = size;
 	for (int i = 0; i < GetTotalSlotsCount(); ++i)

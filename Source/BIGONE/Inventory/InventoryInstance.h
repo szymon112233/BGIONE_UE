@@ -21,7 +21,7 @@ public:
 	TArray<UItemStackInstance*> Items;
 
 	UFUNCTION(BlueprintCallable)
-	void Initialize(FIntPoint Size);
+	void Initialize(FIntPoint Size, FString Name = "Inventory");
 
 	UFUNCTION(BlueprintCallable)
 	bool IsEmpty() const;
@@ -59,6 +59,9 @@ public:
 	bool RemoveItemByPosition(FIntPoint position);
 
 private:
+	
+	UPROPERTY(EditAnywhere)
+	FString InventoryName;
 
 	UPROPERTY(EditAnywhere)
 	FIntPoint Size;
